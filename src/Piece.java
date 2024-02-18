@@ -1,7 +1,6 @@
 enum piecesName {
     whiteKing, whiteQueens, whiteBishops, whiteKnights, whiteRooks, whitePawns,
-    blackKing, blackQueens, blackBishops, blackKnights, blackRooks, blackPawns,
-    allWhite, allBlack, allPieces
+    blackKing, blackQueens, blackBishops, blackKnights, blackRooks, blackPawns
 }
 
 enum boardSquares {
@@ -22,9 +21,10 @@ enum boardFiles {
 public class Piece {
     public long bitBoard;
     public piecesName pieceName;
-    public static long allWhite = 0B1111111111111111L;
+//    public static long allWhite = 0B1111111111111111L;
+    public static long allWhite = 0B1001111111111111110L;
     public static long allBlack = 0B1111111111111111000000000000000000000000000000000000000000000000L;
-    public static long allPieces = 0B1111111111111111000000000000000000000000000000001111111111111111L;
+    public static long allPieces = allWhite | allBlack;
 
     public Piece(piecesName pieceName) {
         setBitBoard(pieceName);
@@ -34,7 +34,8 @@ public class Piece {
     public void setBitBoard(piecesName pieceName) {
         switch (pieceName){
             case whitePawns -> bitBoard = 0B1111111100000000L;
-            case whiteRooks -> bitBoard = 0B10000001L;
+//            case whiteRooks -> bitBoard = 0B10000001L;
+            case whiteRooks -> bitBoard = 0B100_10000000L;
             case whiteKnights -> bitBoard = 0B1000010L;
             case whiteBishops -> bitBoard = 0B100100L;
             case whiteQueens -> bitBoard = 0B1000L;
@@ -49,14 +50,14 @@ public class Piece {
         }
     }
 
-    private long maskRank(int a) {
+    public long maskRank(int a) {
         return (0B1111_1111L << a * 8);
     }
-    private long clearRank(int a) {
+    public long clearRank(int a) {
         return ~(0B1111111111111111111111111111111111111111111111111111111111111111L & maskRank(a));
     }
 
-    private long maskFile(boardFiles a) {
+    public long maskFile(boardFiles a) {
         return (0B100000001000000010000000100000001000000010000000100000001L << a.ordinal());
     }
     public long clearFile(boardFiles a) {
@@ -154,5 +155,88 @@ class KnightsBlack extends Piece{
         long spot8 = (localisation & fileAB) >> 10;
 
         return (spot1 | spot2 | spot3 | spot4 | spot5 | spot7 | spot8 | spot6) & (~allBlack);
+    }
+}
+
+class PawnsWhite extends Piece{
+
+    public PawnsWhite() {
+        super(piecesName.whitePawns);
+    }
+
+    public long getValidMoves(boardSquares loc) {
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long singleStep = (localisation << 8) & (~allPieces);
+        long doubleStep = (singleStep << 8) & (~allPieces);
+
+        return (singleStep | doubleStep ) & (~allPieces);
+    }
+}
+
+class PawnsBlack extends Piece{
+
+    public PawnsBlack() {
+        super(piecesName.blackPawns);
+    }
+
+    public long getValidMoves(boardSquares loc) {
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long singleStep = (localisation >> 8) & (~allPieces);
+        long doubleStep = (singleStep >> 8) & (~allPieces);
+
+        return (singleStep | doubleStep ) & (~allPieces);
+    }
+
+}
+
+class BishopsWhite extends Piece{
+
+    public BishopsWhite() {
+        super(piecesName.whiteBishops);
+    }
+
+    public long getValidMoves(boardSquares loc){
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        return 0;
+    }
+}
+
+class BishopsBlack extends Piece{
+
+    public BishopsBlack() {
+        super(piecesName.blackBishops);
+    }
+
+    public long getValidMoves(boardSquares loc){
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        return 0;
+    }
+}
+
+class RooksWhite extends Piece{
+
+    public RooksWhite() {
+        super(piecesName.whiteRooks);
+    }
+
+    public long getValidMoves(boardSquares loc){
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+
+        long vertical;
+
+        long horizontal = (maskRank(loc.ordinal() / 8) & (~localisation)) & ~allWhite;
+        return  horizontal;
+    }
+}
+
+class RooksBlack extends Piece{
+
+    public RooksBlack() {
+        super(piecesName.blackRooks);
+    }
+
+    public long getValidMoves(boardSquares loc){
+        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        return 0;
     }
 }
