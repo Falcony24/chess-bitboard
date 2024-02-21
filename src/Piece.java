@@ -1,8 +1,3 @@
-enum piecesName {
-    whiteKing, whiteQueens, whiteBishops, whiteKnights, whiteRooks, whitePawns,
-    blackKing, blackQueens, blackBishops, blackKnights, blackRooks, blackPawns
-}
-
 enum boardSquares {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -22,7 +17,7 @@ public class Piece {
     public long bitBoard;
     public piecesName pieceName;
 //    public static long allWhite = 0B1111111111111111L;
-    public static long allWhite = 0B1001111111111111110L;
+    public static long allWhite = 0B1000000001111111111111110L;
     public static long allBlack = 0B1111111111111111000000000000000000000000000000000000000000000000L;
     public static long allPieces = allWhite | allBlack;
 
@@ -35,7 +30,7 @@ public class Piece {
         switch (pieceName){
             case whitePawns -> bitBoard = 0B1111111100000000L;
 //            case whiteRooks -> bitBoard = 0B10000001L;
-            case whiteRooks -> bitBoard = 0B100_10000000L;
+            case whiteRooks -> bitBoard = 0B10000000010000000L;
             case whiteKnights -> bitBoard = 0B1000010L;
             case whiteBishops -> bitBoard = 0B100100L;
             case whiteQueens -> bitBoard = 0B1000L;
@@ -63,6 +58,10 @@ public class Piece {
     public long clearFile(boardFiles a) {
         return ~(0B1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111L & maskFile(a));
     }
+
+    public void updateAll(){
+        allPieces = allWhite | allBlack;
+    }
 }
 
 class KingWhite extends Piece{
@@ -83,7 +82,6 @@ class KingWhite extends Piece{
 
         return (spot1 | spot2 | spot3 | spot4 | spot5 | spot7 | spot8 | spot6) & (~allWhite);
     }
-
 }
 
 class KingBlack extends Piece{
@@ -194,22 +192,12 @@ class BishopsWhite extends Piece{
     public BishopsWhite() {
         super(piecesName.whiteBishops);
     }
-
-    public long getValidMoves(boardSquares loc){
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
-        return 0;
-    }
 }
 
 class BishopsBlack extends Piece{
 
     public BishopsBlack() {
         super(piecesName.blackBishops);
-    }
-
-    public long getValidMoves(boardSquares loc){
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
-        return 0;
     }
 }
 
@@ -218,15 +206,6 @@ class RooksWhite extends Piece{
     public RooksWhite() {
         super(piecesName.whiteRooks);
     }
-
-    public long getValidMoves(boardSquares loc){
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
-
-        long vertical;
-
-        long horizontal = (maskRank(loc.ordinal() / 8) & (~localisation)) & ~allWhite;
-        return  horizontal;
-    }
 }
 
 class RooksBlack extends Piece{
@@ -234,9 +213,18 @@ class RooksBlack extends Piece{
     public RooksBlack() {
         super(piecesName.blackRooks);
     }
+}
 
-    public long getValidMoves(boardSquares loc){
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
-        return 0;
+class QueensWhite extends Piece{
+
+    public QueensWhite() {
+        super(piecesName.whiteQueens);
+    }
+}
+
+class QueensBlack extends Piece{
+
+    public QueensBlack() {
+        super(piecesName.blackQueens);
     }
 }
