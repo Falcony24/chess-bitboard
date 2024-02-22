@@ -1,53 +1,57 @@
-import java.util.ArrayList;
-
 public class Game {
-    private PawnsWhite pawnsW = new PawnsWhite();
-    private PawnsBlack pawnsB = new PawnsBlack();
-    private KnightsWhite knightsW = new KnightsWhite();
-    private KnightsBlack knightsB = new KnightsBlack();
-    private BishopsWhite bishopsW = new BishopsWhite();
-    private BishopsBlack bishopsB = new BishopsBlack();
-    private RooksWhite rooksW = new RooksWhite();
-    private RooksBlack rooksB = new RooksBlack();
-    private QueensWhite queensW = new QueensWhite();
-    private QueensBlack queensB = new QueensBlack();
-    private KingWhite kingW = new KingWhite();
-    private KingBlack kingB = new KingBlack();
+    public PawnsWhite pawnsW = new PawnsWhite();
+    public PawnsBlack pawnsB = new PawnsBlack();
+    public KnightsWhite knightsW = new KnightsWhite();
+    public KnightsBlack knightsB = new KnightsBlack();
+    public BishopsWhite bishopsW = new BishopsWhite();
+    public BishopsBlack bishopsB = new BishopsBlack();
+    public RooksWhite rooksW = new RooksWhite();
+    public RooksBlack rooksB = new RooksBlack();
+    public QueensWhite queensW = new QueensWhite();
+    public QueensBlack queensB = new QueensBlack();
+    public KingWhite kingW = new KingWhite();
+    public KingBlack kingB = new KingBlack();
 
     private char[] board = new char[64];
 
-    public void buildBoard(){
-        ArrayList<Piece> a = new ArrayList<>(12);
-        a.add(pawnsW);
-        a.add(pawnsB);
-        a.add(knightsW);
-        a.add(kingB);
-        a.add(bishopsW);
-        a.add(bishopsB);
-        a.add(rooksW);
-        a.add(rooksB);
-        a.add(queensW);
-        a.add(queensB);
-        a.add(kingW);
-        a.add(kingB);
+    public char[] buildBoard() {
+        char[] board = new char[64];
 
-        String bits;
-        char p;
-        char[] ps = {'K', 'Q', 'B', 'N', 'R', 'P','k', 'q', 'b', 'n', 'r', 'p'};
-        for (Piece b: a) {
-            bits = Long.toBinaryString(b.bitBoard);
-            p = ps[b.pieceName.ordinal()];
-            for(int i = 0; i < bits.length(); i++){
-                if(bits.charAt(i) == '1'){
-                    board[bits.length() - i - 1] = p;
-                }
+        long bitBoard = Piece.allPieces;
+        while (bitBoard != 0) {
+            int index = Long.numberOfTrailingZeros(bitBoard);
+            board[63 - index] = '1';
+            bitBoard ^= 1L << index;
+        }
+        return board;
+    }
+
+    public void printBoard(char[] board) {
+        for (int i = 0; i < board.length; i++) {
+            if (i % 8 == 0) {
+                System.out.println();
             }
+            System.out.print(board[i] + " ");
         }
     }
 
-    public void printBoard(){
-        for(int i = 0; i < board.length; i++){
-            if(i % 8 == 0 ){
+    private char[] buildAttackedBoard(long bitBoard)
+    {
+        char[] board = new char[64];
+        String bits = Long.toBinaryString(bitBoard);
+        for (int i = 0; i < bits.length(); i++) {
+            if (bits.charAt(i) == '1') {
+                board[bits.length() - i - 1] = '1';
+            }
+        }
+        return board;
+    }
+
+    public void printAttackedBoard(long bitBoard) {
+        char[] board = buildAttackedBoard(bitBoard);
+
+        for (int i = 0; i < board.length; i++) {
+            if (i % 8 == 0) {
                 System.out.println();
             }
             System.out.print(board[i] + " ");
