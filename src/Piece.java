@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 enum boardSquares {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -21,7 +24,7 @@ enum boardFiles {
 public class Piece {
     protected long bitBoard;
     protected piecesName pieceName;
-    private char pieceSymbol;
+    private final char pieceSymbol;
     public static long allWhite = 0B1111111111111111L;
     public static long allBlack = 0B1111111111111111000000000000000000000000000000000000000000000000L;
     public static long allPieces = allWhite | allBlack;
@@ -63,9 +66,9 @@ public class Piece {
     }
 
     public long maskRank(int a) {return (0B1111_1111L << a * 8);}
-    public long clearRank(int a) {return ~(maskRank(a));}
+    public long clearRank(int a) {return ~(0B1111_1111L << a * 8);}
     public long maskFile(boardFiles a) {return (0B100000001000000010000000100000001000000010000000100000001L << a.ordinal());}
-    public long clearFile(boardFiles a) {return ~(maskFile(a));}
+    public long clearFile(boardFiles a) {return ~(0B100000001000000010000000100000001000000010000000100000001L << a.ordinal());}
 
     static void updateAllPieces(){allPieces = allWhite | allBlack;}
 }
@@ -184,7 +187,6 @@ class PawnsBlack extends Piece{
 
         return (singleStep | doubleStep ) & (~allPieces);
     }
-
 }
 
 class BishopsWhite extends Piece{
@@ -203,11 +205,19 @@ class RooksWhite extends Piece{
     public RooksWhite() {
         super(piecesName.whiteRooks, 'R');
     }
+
+    public long getValidMoves(boardSquares loc){
+        return 0;
+    }
 }
 
 class RooksBlack extends Piece{
     public RooksBlack() {
         super(piecesName.blackRooks, 'r');
+    }
+
+    public long getValidMoves(boardSquares loc) {
+        return 0;
     }
 }
 
