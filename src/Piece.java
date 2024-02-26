@@ -202,12 +202,13 @@ class BishopsBlack extends Piece{
 }
 
 class RooksWhite extends Piece{
+    private SlidersAttack a = new SlidersAttack();
     public RooksWhite() {
         super(piecesName.whiteRooks, 'R');
     }
 
     public long getValidMoves(boardSquares loc){
-        return 0;
+        return a.maskRook(loc);
     }
 }
 
