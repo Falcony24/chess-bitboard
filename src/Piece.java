@@ -29,7 +29,7 @@ public class Piece {
     public static long allBlack = 0B1111111111111111000000000000000000000000000000000000000000000000L;
     public static long allPieces = allWhite | allBlack;
 
-    public Piece(piecesName pieceName, char pieceSymbol) {
+    public Piece(piecesName pieceName, char pieceSymbol){
         setBitBoard(pieceName);
         this.pieceName = pieceName;
         this.pieceSymbol = pieceSymbol;
@@ -69,8 +69,7 @@ public class Piece {
     public long clearRank(int a) {return ~(0B1111_1111L << a * 8);}
     public long maskFile(boardFiles a) {return (0B100000001000000010000000100000001000000010000000100000001L << a.ordinal());}
     public long clearFile(boardFiles a) {return ~(0B100000001000000010000000100000001000000010000000100000001L << a.ordinal());}
-
-    static void updateAllPieces(){allPieces = allWhite | allBlack;}
+    static void updateAllPieces() {allPieces = allWhite | allBlack;}
 }
 
 class KingWhite extends Piece{
@@ -117,7 +116,7 @@ class KnightsWhite extends Piece{
     }
 
     public long getValidMoves(boardSquares loc) {
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long localisation = bitBoard & (1L << loc.ordinal());
         long fileA = clearFile(boardFiles.A);
         long fileH = clearFile(boardFiles.H);
         long fileAB = fileA & clearFile(boardFiles.B);
@@ -142,7 +141,7 @@ class KnightsBlack extends Piece{
     }
 
     public long getValidMoves(boardSquares loc) {
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long localisation = bitBoard & (1L << loc.ordinal());
         long fileA = clearFile(boardFiles.A);
         long fileH = clearFile(boardFiles.H);
         long fileAB = fileA & clearFile(boardFiles.B);
@@ -167,7 +166,7 @@ class PawnsWhite extends Piece{
     }
 
     public long getValidMoves(boardSquares loc) {
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long localisation = bitBoard & (1L << loc.ordinal());
         long singleStep = (localisation << 8) & (~allPieces);
         long doubleStep = (singleStep << 8) & (~allPieces);
 
@@ -181,7 +180,7 @@ class PawnsBlack extends Piece{
     }
 
     public long getValidMoves(boardSquares loc) {
-        long localisation = bitBoard & (long) Math.pow(2, loc.ordinal());
+        long localisation = bitBoard & (1L << loc.ordinal());
         long singleStep = (localisation >> 8) & (~allPieces);
         long doubleStep = (singleStep >> 8) & (~allPieces);
 
@@ -196,19 +195,24 @@ class BishopsWhite extends Piece{
 }
 
 class BishopsBlack extends Piece{
+    private SlidersAttack a = new SlidersAttack(getPieceSymbol());
     public BishopsBlack() {
         super(piecesName.blackBishops, 'b');
+    }
+
+    public void getValidMoves(boardSquares loc){
+        a.findMagic(loc);
     }
 }
 
 class RooksWhite extends Piece{
-    private SlidersAttack a = new SlidersAttack();
+    private SlidersAttack a = new SlidersAttack(getPieceSymbol());
     public RooksWhite() {
         super(piecesName.whiteRooks, 'R');
     }
 
-    public long getValidMoves(boardSquares loc){
-        return a.maskRook(loc);
+    public void getValidMoves(boardSquares loc){
+        a.findMagic(loc);
     }
 }
 

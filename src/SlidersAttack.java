@@ -2,6 +2,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SlidersAttack {
+    private char piece;
+
+    public SlidersAttack(char piece) {
+        this.piece = piece;
+    }
+
     protected static final ArrayList<Integer> rooksRelevantBits = new ArrayList<>(Arrays.asList(
             12, 11, 11, 11, 11, 11, 11, 12,
             11, 10, 10, 10, 10, 10, 10, 11,
@@ -56,31 +62,47 @@ public class SlidersAttack {
 
         return attacks;
     }
-//    long findMagic(boardSquares square, int relevant_bits, char piece) {
-//        long[] occupancies = new long[4096];
-//        long[] attacks = new long[4096];
-//        long[] usedAttacks = new long[4096];
-//        long maskAttack;
-//
-//        if(piece == 'r' || piece == 'R'){
-//            maskAttack = maskRook(square);
-//        }
-//        else{
-//            maskAttack = maskBishop(square);
-//        }
-//
-//        // occupancy variations
-//        int occupancyVariations = 1 << relevant_bits;
-//
-//        // loop over the number of occupancy variations
-//        for(int i = 0; i < occupancyVariations; i++) {
-//            // init occupancies
-//            occupancies[i] = set_occupancy(i, relevant_bits, mask_attack);
-//
-//            // init attacks
+
+    long setOccupancy(int index, int bitsInMask, long attackMask)
+    {
+        long occupancy = 0L;
+
+        for (int i = 0; i < bitsInMask; i++){
+            int square = BitManipulation.getLS1BIndex(attackMask);
+            BitManipulation.popBit(attackMask, square);
+
+            if ((index & (1 << i)) != 0) occupancy |= (1L << square);
+        }
+        return occupancy;
+    }
+    long findMagic(boardSquares square) {
+        long[] occupancies = new long[4096];
+        long[] attacks = new long[4096];
+        long[] usedAttacks = new long[4096];
+        long maskAttack;
+        int occupancyVariations;
+        int relevantBits;
+
+        if(piece == 'r' || piece == 'R') {
+            maskAttack = maskRook(square);
+            relevantBits = rooksRelevantBits.get(square.ordinal());
+            occupancyVariations = 1 << relevantBits;
+        }
+        else {
+            maskAttack = maskBishop(square);
+            relevantBits = bishopsRelevantBits.get(square.ordinal());
+            occupancyVariations = 1 << relevantBits;
+        }
+
+
+        for(int i = 0; i < occupancyVariations; i++) {
+            occupancies[i] = setOccupancy(i, relevantBits, maskAttack);
+
+            System.out.println(occupancies[i]);
+            // init attacks
 //            attacks[i] = bishop ? bishop_attacks_on_the_fly(square, occupancies[count]) :
 //                    rook_attacks_on_the_fly(square, occupancies[count]);
-//        }
+        }
 //
 //        // test magic numbers
 //        for(int random_count = 0; random_count < 100000000; random_count++)
@@ -117,6 +139,6 @@ public class SlidersAttack {
 //
 //        // on fail
 //        printf("***Failed***\n");
-//        return 0ULL;
-//    }
+        return 0L;
+    }
 }
